@@ -13,3 +13,5 @@ Design was provided.
 1. Select what type of record is needed to add to the month report from the drop-down ("+" sign for income and "-" for expense);
 2. Add short description and amount, submit;
 3. New record appears in corresponding list, total month budget is updated.
+
+<img width="800" alt="Preview of Budget app" src="https://user-images.githubusercontent.com/11509516/121700065-32440f80-cad8-11eb-9057-5ad04babac45.png">
