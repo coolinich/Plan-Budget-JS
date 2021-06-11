@@ -1,19 +1,8 @@
-/**
- * В обьекте два поля - массив объектов прибылей и расходов.
- * В каждом массиве элемент - это объект из следующих полей
- * id - произвольная уникальная строка
- * type - маркер типа суммы (возможные значение "income", "expense")
- * description - описание суммы
- * value - сумма
- */
-
 let storage = {
     current_list_income: [],
     current_list_expense: [],
 };
 
-
-// Объект с просуммированными данными об общей прибыли, расходе, и балансе
 let allBudgets = {
     totalBudget: 0,
     incomeBudget: 0,
@@ -37,10 +26,10 @@ const descriptionInput = form.querySelector('.add__description');
 const valueInput = form.querySelector('.add__value');
 
 
-/**** Вспомогательные функции ****/
+/**** Utility functions ****/
 /**
- * generate_id - создает произвольную строку длины 10
- * @returns {string} - новый id
+ * generate_id - generate string of 10 ranndom symbols to use as id of records
+ * @returns {string} - new id
  */
 const generate_id = () => {
     const words = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
@@ -49,8 +38,8 @@ const generate_id = () => {
 }
 
 /**
- * update_total_budgets - подсчитывает общую прибыль, расход, и баланс
- * @returns {Object} - объект со вычисленными значениями общих прибыли, расхода, и баланса
+ * update_total_budgets - function to calculate income, expense and total budgets
+ * @returns {Object} - object of calculated income, expense and total budgets
 */
 const update_total_budgets = () => {
     allBudgets.incomeBudget = Math.round(storage.current_list_income.reduce( (prev, current) => prev += parseFloat(current.value), 0) * 100) / 100;
@@ -60,10 +49,8 @@ const update_total_budgets = () => {
     return allBudgets;
 }
 
-/**** Функции - обработчики событий ****/
-/**
- * Изменение стилей при переключении типа суммы
-*/
+/**** Event listeners ****/
+
 typeSelect.addEventListener('change', (e) => {
    switch (e.target.value) {
        case 'expense':
@@ -80,17 +67,11 @@ typeSelect.addEventListener('change', (e) => {
    }
 });
 
-/**
- * Если была попытка неудачного сабмита формы (не заполнено хоть одно поле), обработка ситуации, когда в поле было введено значение. В случае, если все поля уже заполнены, также активируется кнопка сабмит.
-*/
 form.addEventListener('input', (e) => {
     if (e.target.classList.contains('red-transparent-background')) e.target.classList.remove('red-transparent-background');
     if (descriptionInput.value && valueInput.value) submitBtn.disabled = false;
 });
 
-/**
- * Сброс состояния формы после отправки
-*/
 form.addEventListener('reset', (e) => {
     if (typeSelect.classList.contains('red-focus')) typeSelect.classList.remove('red-focus');
     if (descriptionInput.classList.contains('red-focus')) descriptionInput.classList.remove('red-focus'); 
@@ -98,9 +79,6 @@ form.addEventListener('reset', (e) => {
     if (submitBtn.classList.contains('red')) submitBtn.classList.remove('red');
 });
 
-/**
- * Сабмит формы. Если хоть одно поле не заполнено, на нем добавляется красный фон, кнопка Сабмит становится неактивной. 
-*/
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!descriptionInput.value || !valueInput.value) {
@@ -114,9 +92,6 @@ form.addEventListener('submit', (e) => {
     form.reset();
 })
 
-/**
- * Удаление записи в таблице при клике на кнопку "удалить"
-*/
 budgetsList.addEventListener('click', (e) => {
     if (e.target.parentElement.parentElement.classList.contains('item__delete')){
         let idParent = e.target.closest('.item').getAttribute('id');
@@ -124,13 +99,12 @@ budgetsList.addEventListener('click', (e) => {
     }
 });
 
-/**** Функции для работы с DOM ****/
+/**** Functions to work with DOM ****/
 /**
- * update_budget_template - обновляет общие балансы в разметке
+ * update_budget_template - function to refresh budgets in layout
 */
 const update_budget_template = () => {
     update_total_budgets();
-
     incomeBudget.textContent = allBudgets.incomeBudget  ? `+ ${allBudgets.incomeBudget}` : `${allBudgets.incomeBudget}`;
     expenseBudget.textContent = allBudgets.expenseBudget ? `- ${allBudgets.expenseBudget}` : `${allBudgets.expenseBudget}`;
     if (allBudgets.totalBudget > 0) totalBudget.textContent = `+ ${allBudgets.totalBudget}`;
@@ -140,8 +114,8 @@ const update_budget_template = () => {
 
 
 /**
- * add_new_item_template - добавление разметки новой записи в DOM страницы
- * @param {*} item - обьект записи, которую надо добавить в разметке
+ * add_new_item_template - add template of new record to page DOM
+ * @param {*} item - object of record to be added
  */
 
 const add_new_item_template = (item) => {
@@ -150,9 +124,9 @@ const add_new_item_template = (item) => {
 }
 
 /**
- * create_item_template - создание разметки новой записи
- * @param {*} item - обьект записи, которую надо добавить в разметке
- * @returns {String} - разметка новой записи
+ * create_item_template - create layout of record to be added
+ * @param {*} item - object of record to be added
+ * @returns {String} - layout of record to be added
  */
 const create_item_template = (item) => {
     let sign = item.type === 'income' ? '+' : '-';
@@ -160,7 +134,7 @@ const create_item_template = (item) => {
         <div class="item clearfix" id="${item.type}-${item.id}">
             <div class="item__description">${item.description}</div>
             <div class="right clearfix">
-                <div class="item__value">${sign} ${item.value}</div>
+                <div class="item__value">${sign} ${+item.value}</div>
                 <div class="item__delete">
                     <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>
                 </div>
@@ -171,8 +145,8 @@ const create_item_template = (item) => {
 
 
 /**
- * delete_item_from_html - удаление одной записи из таблицы в DOM страницы
- * @param {String} id - уникальный идентификатор
+ * delete_item_from_html - remove one item from the list in DOM
+ * @param {String} id - unique identifier of the item
  * @param {*} id 
  */
 const delete_item_from_html = id => {
@@ -181,36 +155,34 @@ const delete_item_from_html = id => {
     target_parent.removeChild(target);
 }
 
-/**** Функции для работы с данными и обновлением отображения ****/
+/**** Functions for data handling ****/
 /**
- * add_new_item - функция для добавления новой суммы
- * @param {String} description - описание суммы 
- * @param {String} value - сумма
- * @returns {Array} - массив всех записей
+ * add_new_item - add new item
+ * @param {String} description - amount description 
+ * @param {String} value - amount
+ * @returns {Array} - array of all records
  */
 const add_new_item = (description, value) => {
-    if (!description) return console.log("Введите описание суммы.");
-    if (!value) return console.log("Введите сумму.");
+    if (!description || !value) return;
     const type = typeSelect.value;
     const new_item = { type, description, value, id: generate_id() };
     new_item.type === 'income' ? storage.current_list_income.push(new_item) : storage.current_list_expense.push(new_item);
     add_new_item_template(new_item);
     update_budget_template();
-
     return storage;
 }
 
 /**
- * delete_item - удаление одной записи
- * @param {String} id - уникальный идентификатор  
- * @returns {Array} - массив всех записей
+ * delete_item - delete one item from the list
+ * @param {String} id - unique indentifier of the item
+ * @returns {Array} - array of all records
  */
 const delete_item = id => {
-    if (!id) return console.log("Передайте id удаляемой суммы.");
+    if (!id) return console.log("Specify id of item to be removed");
     let type = id.slice(0, id.indexOf('-'));
     let idItem = id.slice(id.indexOf('-') + 1);
     
-    if (!storage.current_list_income.some(item => item.id === idItem) && !storage.current_list_expense.some(item => item.id === idItem)) return console.log("Нет записи с таким id.");
+    if (!storage.current_list_income.some(item => item.id === idItem) && !storage.current_list_expense.some(item => item.id === idItem)) return console.log("No record with such id.");
     
     if (type === 'income') {
         storage.current_list_income = storage.current_list_income.filter(item => item.id !== idItem);
@@ -226,12 +198,11 @@ const delete_item = id => {
 }
 
 /**
- * Самовызывающаяся функция для инициализации данных при обновлении страницы
+ * Self-invocing function to set initial data after page load
 */
 
 (function initialState(){
     let currentDate = new Date();
-    dateText.textContent = `${currentDate.toLocaleDateString('en-US', {year: 'numeric',
-    month: 'long'})}`;
+    dateText.textContent = `${currentDate.toLocaleDateString('en-US', {year: 'numeric', month: 'long'})}`;
     update_budget_template();
 })();
